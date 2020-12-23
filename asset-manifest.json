@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/kalimba/static/css/main.f9a453be.chunk.css",
-    "main.js": "/kalimba/static/js/main.a9acbb5d.chunk.js",
-    "main.js.map": "/kalimba/static/js/main.a9acbb5d.chunk.js.map",
+    "main.css": "/kalimba/static/css/main.0db61b71.chunk.css",
+    "main.js": "/kalimba/static/js/main.84d45592.chunk.js",
+    "main.js.map": "/kalimba/static/js/main.84d45592.chunk.js.map",
     "runtime-main.js": "/kalimba/static/js/runtime-main.1f68a3fd.js",
     "runtime-main.js.map": "/kalimba/static/js/runtime-main.1f68a3fd.js.map",
-    "static/js/2.5bbfdc40.chunk.js": "/kalimba/static/js/2.5bbfdc40.chunk.js",
-    "static/js/2.5bbfdc40.chunk.js.map": "/kalimba/static/js/2.5bbfdc40.chunk.js.map",
+    "static/js/2.44b08ccb.chunk.js": "/kalimba/static/js/2.44b08ccb.chunk.js",
+    "static/js/2.44b08ccb.chunk.js.map": "/kalimba/static/js/2.44b08ccb.chunk.js.map",
     "index.html": "/kalimba/index.html",
-    "static/css/main.f9a453be.chunk.css.map": "/kalimba/static/css/main.f9a453be.chunk.css.map",
-    "static/js/2.5bbfdc40.chunk.js.LICENSE.txt": "/kalimba/static/js/2.5bbfdc40.chunk.js.LICENSE.txt"
+    "static/css/main.0db61b71.chunk.css.map": "/kalimba/static/css/main.0db61b71.chunk.css.map",
+    "static/js/2.44b08ccb.chunk.js.LICENSE.txt": "/kalimba/static/js/2.44b08ccb.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.1f68a3fd.js",
-    "static/js/2.5bbfdc40.chunk.js",
-    "static/css/main.f9a453be.chunk.css",
-    "static/js/main.a9acbb5d.chunk.js"
+    "static/js/2.44b08ccb.chunk.js",
+    "static/css/main.0db61b71.chunk.css",
+    "static/js/main.84d45592.chunk.js"
   ]
 }
