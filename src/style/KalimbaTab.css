@@ -1,0 +1,33 @@
+.KalimbaTab {
+    padding: 15px;
+}
+
+.KalimbaTab textarea {
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #333;
+    color: #eee;
+}
+
+.KalimbaTab .control button {
+    margin: 2px;
+}
+
+.KalimbaTab .tab {
+    padding: 15px;
+}
+
+.KalimbaTab .note {
+    display: inline-block;
+    margin: 10px 3px;
+    padding: 1px 4px;
+    border-radius: 5px;
+    text-shadow: 0 0 3px black;
+}
+
+.KalimbaTab .chord {
+    padding: 2px 1px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
