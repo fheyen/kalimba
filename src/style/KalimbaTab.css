@@ -9,8 +9,14 @@
     color: #eee;
 }
 
-.KalimbaTab .control button {
-    margin: 2px;
+.KalimbaTab .control button,
+.KalimbaTab .control input,
+.KalimbaTab .control select {
+    margin: 2px 5px;
+}
+
+.KalimbaTab .control label {
+    margin-right: 10px;
 }
 
 .KalimbaTab .tab {

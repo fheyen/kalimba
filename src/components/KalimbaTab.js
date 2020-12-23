@@ -1,6 +1,6 @@
 import React from 'react';
 import View from '../lib/ui/View';
-import { Lamellophone, Utils } from '../../node_modules/musicvis-lib/dist/musicvislib';
+import { Lamellophone, Utils, NoteArray } from '../../node_modules/musicvis-lib/dist/musicvislib';
 import '../style/KalimbaTab.css';
 
 
@@ -15,7 +15,8 @@ export default class PitchTimeChart extends View {
             useHtml: true,
             letter: true,
             midi: false,
-            track: 0
+            track: 0,
+            transpose: 0
         };
         this.tuning = Lamellophone.lamellophoneTunings.get('Kalimba').get('17 C Major');
         this.numberLetterMap = new Map([
@@ -34,13 +35,18 @@ export default class PitchTimeChart extends View {
     }
 
     updateTab = () => {
-        const { midi, track, useHtml, letter } = this.state;
+        const { midi, track, transpose, useHtml, letter } = this.state;
         const { midiFileData } = this.props;
 
         let notes = [];
 
         if (midi) {
-            notes = midiFileData[track];
+            if (midiFileData.length - 1 >= track) {
+                notes = midiFileData[track];
+                if (transpose !== 0) {
+                    notes = new NoteArray(notes).transpose(transpose * 12).getNotes();
+                }
+            }
         } else {
             const text = this.textArea.value;
             const letterFormat = Lamellophone.convertNumbersToLetters(text, this.numberLetterMap);
@@ -70,7 +76,7 @@ export default class PitchTimeChart extends View {
 
 
     render() {
-        const { viewWidth, viewHeight, midi, useHtml, letter } = this.state;
+        const { viewWidth, viewHeight, midi, transpose, useHtml, letter } = this.state;
         const { midiFileData } = this.props;
         // HTML
         return (
@@ -88,27 +94,56 @@ export default class PitchTimeChart extends View {
                     onChange={this.updateTab}
                 />
                 <div className='control'>
-                    <button onClick={() => this.setState({ midi: !midi })}>
-                        {midi ? 'MIDI' : 'Text'}
-                    </button>
-                    {midi &&
-                        <select onChange={e => this.setState({ track: +e.target.value })}>
-                            {midiFileData.map((d, i) => (
-                                <option
-                                    key={i}
-                                    value={i}
-                                >
-                                    Track {i} ({d.length} notes)
-                                </option>
-                            ))}
-                        </select>
-                    }
-                    <button onClick={() => this.setState({ useHtml: !useHtml })}>
-                        {useHtml ? 'HTML' : 'Text'}
-                    </button>
-                    <button onClick={() => this.setState({ letter: !letter })}>
-                        {letter ? 'Letter' : 'Number'}
-                    </button>
+                    <div>
+                        <label>
+                            Input:
+                            <button onClick={() => this.setState({ midi: !midi })}>
+                                {midi ? 'MIDI' : 'Text'}
+                            </button>
+                        </label>
+                        {midi &&
+                            <label>
+                                Track:
+                                <select onChange={e => this.setState({ track: +e.target.value })}>
+                                    {midiFileData.map((d, i) => (
+                                        <option
+                                            key={i}
+                                            value={i}
+                                        >
+                                            Track {i} ({d.length} notes)
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        }
+                        {midi &&
+                            <label>
+                                Transpose:
+                                <input
+                                    type='number'
+                                    defaultValue={transpose}
+                                    min='-4'
+                                    max='4'
+                                    step='1'
+                                    onChange={e => this.setState({ transpose: +e.target.value })}
+                                />
+                            </label>
+                        }
+                    </div>
+                    <div>
+                        <label>
+                            Output:
+                            <button onClick={() => this.setState({ useHtml: !useHtml })}>
+                                {useHtml ? 'HTML' : 'Text'}
+                            </button>
+                        </label>
+                        <label>
+                            Note symbols:
+                            <button onClick={() => this.setState({ letter: !letter })}>
+                                {letter ? 'Letter' : 'Number'}
+                            </button>
+                        </label>
+                    </div>
                 </div>
                 <div
                     className='tab'

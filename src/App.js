@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './style/App.css';
 import MidiParser from 'midi-parser-js';
-import PitchTimeChart from './components/PitchTimeChart';
+// import PitchTimeChart from './components/PitchTimeChart';
 import KalimbaTab from './components/KalimbaTab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
