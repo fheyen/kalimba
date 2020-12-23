@@ -13,20 +13,12 @@ export default class PitchTimeChart extends View {
         this.state = {
             ...this.state,
             useHtml: true,
-            letter: true
+            letter: true,
+            midi: false,
+            track: 0
         };
-    }
-
-    componentDidUpdate() {
-        this.updateTab();
-    }
-
-    updateTab = () => {
-        const { useHtml, letter } = this.state;
-        const text = this.textArea.value;
-
-        const tuning = Lamellophone.lamellophoneTunings.get('Kalimba').get('17 C Major');
-        const numberLetterMap = new Map([
+        this.tuning = Lamellophone.lamellophoneTunings.get('Kalimba').get('17 C Major');
+        this.numberLetterMap = new Map([
             [1, 'C'],
             [2, 'D'],
             [3, 'E'],
@@ -35,15 +27,32 @@ export default class PitchTimeChart extends View {
             [6, 'A'],
             [7, 'B'],
         ]);
+    }
 
-        const letterFormat = Lamellophone.convertNumbersToLetters(text, numberLetterMap);
-        const notes = Lamellophone.convertTabToNotes(letterFormat, tuning, 120);
+    componentDidUpdate() {
+        this.updateTab();
+    }
+
+    updateTab = () => {
+        const { midi, track, useHtml, letter } = this.state;
+        const { midiFileData } = this.props;
+
+        let notes = [];
+
+        if (midi) {
+            notes = midiFileData[track];
+        } else {
+            const text = this.textArea.value;
+            const letterFormat = Lamellophone.convertNumbersToLetters(text, this.numberLetterMap);
+            notes = Lamellophone.convertTabToNotes(letterFormat, this.tuning, 120);
+        }
+
         console.log(notes);
 
         if (useHtml) {
             this.tab.innerHTML = Lamellophone.convertNotesToHtmlTab(
                 notes,
-                tuning,
+                this.tuning,
                 letter ? 'letter' : 'number',
                 0.1,
                 Utils.noteColorFromPitch
@@ -51,7 +60,7 @@ export default class PitchTimeChart extends View {
         } else {
             this.tab.innerText = Lamellophone.convertNotesToTab(
                 notes,
-                tuning,
+                this.tuning,
                 letter ? 'letter' : 'number',
                 0.1
             );
@@ -61,7 +70,7 @@ export default class PitchTimeChart extends View {
 
 
     render() {
-        const { viewWidth, viewHeight, margin, useHtml, letter } = this.state;
+        const { viewWidth, viewHeight, midi, useHtml, letter } = this.state;
         const { midiFileData } = this.props;
         // HTML
         return (
@@ -79,8 +88,23 @@ export default class PitchTimeChart extends View {
                     onChange={this.updateTab}
                 />
                 <div className='control'>
+                    <button onClick={() => this.setState({ midi: !midi })}>
+                        {midi ? 'MIDI' : 'Text'}
+                    </button>
+                    {midi &&
+                        <select onChange={e => this.setState({ track: +e.target.value })}>
+                            {midiFileData.map((d, i) => (
+                                <option
+                                    key={i}
+                                    value={i}
+                                >
+                                    Track {i} ({d.length} notes)
+                                </option>
+                            ))}
+                        </select>
+                    }
                     <button onClick={() => this.setState({ useHtml: !useHtml })}>
-                        HTML
+                        {useHtml ? 'HTML' : 'Text'}
                     </button>
                     <button onClick={() => this.setState({ letter: !letter })}>
                         {letter ? 'Letter' : 'Number'}
@@ -88,15 +112,12 @@ export default class PitchTimeChart extends View {
                 </div>
                 <div
                     className='tab'
+                    ref={n => this.tab = n}
                     style={{
                         width: '100%',
                         height: viewHeight / 2,
                     }}
-                    ref={n => this.tab = n}
-                    className='tab'
-                >
-
-                </div>
+                />
             </div>
         );
     }
