@@ -1,11 +1,12 @@
 import React from 'react';
 import View from '../lib/ui/View';
-import { Lamellophone, Utils, NoteArray } from '../../node_modules/musicvis-lib/dist/musicvislib';
+import { Lamellophone, Utils, NoteArray } from 'musicvis-lib';
 import '../style/KalimbaTab.css';
+import KalimbaRoll from './KalimbaRoll';
 
 
 
-export default class PitchTimeChart extends View {
+export default class KalimbaTab extends View {
 
     constructor(props) {
         const margin = { top: 35, right: 20, bottom: 40, left: 55 };
@@ -16,7 +17,8 @@ export default class PitchTimeChart extends View {
             letter: true,
             midi: false,
             track: 0,
-            transpose: 0
+            transpose: 0,
+            notes: []
         };
         this.tuning = Lamellophone.lamellophoneTunings.get('Kalimba').get('17 C Major');
         this.numberLetterMap = new Map([
@@ -28,14 +30,12 @@ export default class PitchTimeChart extends View {
             [6, 'A'],
             [7, 'B'],
         ]);
+        this.mounted = false;
     }
 
-    componentDidUpdate() {
-        this.updateTab();
-    }
 
-    updateTab = () => {
-        const { midi, track, transpose, useHtml, letter } = this.state;
+    getNotes = () => {
+        const { midi, track, transpose } = this.state;
         const { midiFileData } = this.props;
 
         let notes = [];
@@ -48,13 +48,22 @@ export default class PitchTimeChart extends View {
                 }
             }
         } else {
-            const text = this.textArea.value;
+            const text = this.textArea ? this.textArea.value : '';
             const letterFormat = Lamellophone.convertNumbersToLetters(text, this.numberLetterMap);
             notes = Lamellophone.convertTabToNotes(letterFormat, this.tuning, 120);
         }
 
         console.log(notes);
+        return notes;
+    }
 
+    updateTab = () => {
+
+        if (!this.tab) { return; }
+        const notes = this.getNotes();
+
+
+        const { useHtml, letter } = this.state;
         if (useHtml) {
             this.tab.innerHTML = Lamellophone.convertNotesToHtmlTab(
                 notes,
@@ -71,28 +80,27 @@ export default class PitchTimeChart extends View {
                 0.1
             );
         }
-
     }
 
 
     render() {
-        const { viewWidth, viewHeight, midi, transpose, useHtml, letter } = this.state;
+        const { viewWidth, viewHeight, midi, track, transpose, useHtml, letter } = this.state;
         const { midiFileData } = this.props;
+        let notes = [];
+        if (this.mounted) {
+            notes = this.getNotes();
+            this.updateTab();
+        } else {
+            this.mounted = true;
+        }
+        console.log(this.textArea?.value);
+
         // HTML
         return (
             <div
                 className='View KalimbaTab'
                 style={{ gridArea: `span ${this.state.rowSpan} / span ${this.state.columnSpan}` }}
             >
-                <textarea
-                    ref={n => this.textArea = n}
-                    style={{
-                        width: viewWidth - 60,
-                        height: viewHeight / 2,
-                    }}
-                    placeholder='Write or paste a kalimba tab in letter notation here'
-                    onChange={this.updateTab}
-                />
                 <div className='control'>
                     <div>
                         <label>
@@ -145,13 +153,39 @@ export default class PitchTimeChart extends View {
                         </label>
                     </div>
                 </div>
+                <input
+                    className='fileInput'
+                    type='file'
+                    id='filereader'
+                    style={{ display: midi ? 'block' : 'none' }}
+                />
+                <textarea
+                    ref={n => this.textArea = n}
+                    style={{
+                        width: viewWidth - 60,
+                        height: viewHeight / 4,
+                        display: midi ? 'none' : 'block'
+                    }}
+                    placeholder='Write or paste a kalimba tab in letter or number notation here'
+                    onChange={this.updateTab}
+                />
                 <div
                     className='tab'
                     ref={n => this.tab = n}
                     style={{
                         width: '100%',
-                        height: viewHeight / 2,
+                        height: viewHeight / 3,
                     }}
+                />
+                <KalimbaRoll
+                    name='Kalimba Roll'
+                    viewSize={{
+                        outerWidth: this.props.viewSize.outerWidth - 60,
+                        outerHeight: viewHeight / 2
+                    }}
+                    data={[notes]}
+                    selectedTrack={track}
+                    currentPlayerTime={0}
                 />
             </div>
         );

@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import './style/App.css';
 import MidiParser from 'midi-parser-js';
-// import PitchTimeChart from './components/PitchTimeChart';
 import KalimbaTab from './components/KalimbaTab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
-// import { preprocessMidiFileData } from 'musicvis-lib';
-import { preprocessMidiFileData } from '../node_modules/musicvis-lib/dist/musicvislib';
+import { preprocessMidiFileData } from 'musicvis-lib';
 
 
 export default class App extends Component {
@@ -57,32 +55,10 @@ export default class App extends Component {
     });
   }
 
-  /**
-   * Changes the current time selection
-   * @param {number[]} timeSelection [start, end] in seconds
-   */
-  setTimeSelection = (timeSelection) => {
-    this.setState({ timeSelection, similarSections: [] });
-  };
-
   render() {
     const s = this.state;
     return (
       <div className={`App dark`} >
-        <div className='fileSelection'>
-          <input
-            className='fileInput'
-            type='file'
-            id='filereader'
-          />
-        </div>
-        {/* <PitchTimeChart
-          name='Note-Time Chart'
-          viewSize={s.viewSize}
-          midiFileData={s.midiFileData}
-          timeSelection={s.timeSelection}
-          setTimeSelection={this.setTimeSelection}
-        /> */}
         <KalimbaTab
           viewSize={s.viewSize}
           midiFileData={s.midiFileData}
