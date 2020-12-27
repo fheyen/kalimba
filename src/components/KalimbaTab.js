@@ -42,8 +42,6 @@ export default class KalimbaTab extends View {
             [7, 'B'],
         ]);
         this.mounted = false;
-        // TODO: move to state
-        this.notes = [];
         // Player
         this.player = new Player()
             .onTimeChange(time => this.setState({ currentPlayerTime: time }))
@@ -55,7 +53,7 @@ export default class KalimbaTab extends View {
         const sharedNotes = this.parseShareUrl();
         if (sharedNotes && sharedNotes.length) {
             console.log(sharedNotes);
-            this.notes = sharedNotes;
+            this.setState({ notes: sharedNotes })
         }
 
         let source = document.getElementById('filereader');
@@ -77,7 +75,7 @@ export default class KalimbaTab extends View {
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.input !== prevState.input) {
-            console.log('input update');
+            // console.log('input update');
             // TODO: update notes
             const notes = this.getNotes();
             this.setState({ notes });
@@ -98,15 +96,13 @@ export default class KalimbaTab extends View {
             if (midiFileData.length - 1 >= track) {
                 notes = midiFileData[track];
                 if (transpose !== 0) {
-                    notes = new NoteArray(notes).transpose(transpose * 12).getNotes();
+                    notes = new NoteArray(notes).transpose(transpose).getNotes();
                 }
             }
         } else {
             const letterFormat = Lamellophone.convertNumbersToLetters(textInput, this.numberLetterMap);
             notes = Lamellophone.convertTabToNotes(letterFormat, this.tuning, 120);
         }
-        // console.log(notes);
-        this.notes = notes;
         return notes;
     }
 
@@ -156,7 +152,8 @@ export default class KalimbaTab extends View {
     }
 
     copyShareUrl = () => {
-        const uri = encodeURI(JSON.stringify(this.notes));
+        const { notes } = this.state;
+        const uri = encodeURI(JSON.stringify(notes));
         const url = `${window.location.href}?notes=${uri}`;
         navigator.clipboard.writeText(url)
             .then(() => {
@@ -181,14 +178,14 @@ export default class KalimbaTab extends View {
 
     render() {
         const { viewWidth, viewHeight, input, output, notes } = this.state;
-        const { midi, midiFileData, track, transpose } = input;
+        const { midi, midiFileData, transpose } = input;
         const { useHtml, letter } = output;
         if (this.mounted) {
             this.updateTab();
         } else {
             this.mounted = true;
         }
-        console.log(this.state);
+        // console.log(this.state);
 
         // HTML
         return (

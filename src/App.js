@@ -46,10 +46,13 @@ export default class App extends Component {
           viewSize={s.viewSize}
         />
         <div className='githubLink'>
-          <a href='https://github.com/fheyen/midi-pianoroll'>
+          <a
+            href='https://github.com/fheyen/kalimba'
+            target='blank'
+          >
             <FontAwesomeIcon icon={faGithub} />&nbsp;
-                        https://github.com/fheyen/midi-pianoroll
-                    </a>
+              https://github.com/fheyen/kalimba
+          </a>
         </div>
       </div >
     );

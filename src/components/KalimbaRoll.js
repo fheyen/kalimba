@@ -7,14 +7,16 @@ import { Utils, Midi, Canvas, Lamellophone } from 'musicvis-lib';
 export default class KalimbaRoll extends View {
 
     constructor(props) {
-        const margin = { top: 30, right: 20, bottom: 20, left: 20 };
+        const margin = { top: 20, right: 20, bottom: 20, left: 20 };
         super(props, margin);
         this.state = {
             ...this.state,
             overviewWidth: 80,
             // For checking if there are new notes
             lastData: [],
-            notes: []
+            lastTuning: [],
+            notes: [],
+            pitchPositionMap: new Map()
         };
     }
 
@@ -26,14 +28,23 @@ export default class KalimbaRoll extends View {
 
     componentDidUpdate() {
         this.resizeComponent();
-        const { data, selectedTrack } = this.props;
-        if (data !== this.state.lastData) {
+        const { data, tuning } = this.props;
+        if (
+            data !== this.state.lastData
+            || tuning !== this.state.lastTuning
+        ) {
+            const pitchPositionMap = new Map();
+            const pitchOrder = tuning.getNotesInInstrumentOrder();
+            for (let i = 0; i < pitchOrder.length; i++) {
+                pitchPositionMap.set(pitchOrder[i], i);
+            }
             // Update state, cache notes
             this.setState(
                 {
                     lastData: data,
-                    lastTrack: selectedTrack,
-                    notes: data
+                    notes: data,
+                    lastTuning: tuning,
+                    pitchPositionMap
                 },
                 this.updateBackground
             );
@@ -61,12 +72,12 @@ export default class KalimbaRoll extends View {
 
     updateBackground = () => {
         const { viewWidth, viewHeight, x, xOv, yOv, notes } = this.state;
-        if (!notes || notes.length === 0) { return; }
+        const { tuning } = this.props;
+        // if (!notes || notes.length === 0) { return; }
 
         // Set x scale domain
-        const [low, high] = extent(notes, d => d.pitch);
-        x.domain([low - 1, high + 2]);
-        xOv.domain([low, high + 1]);
+        x.domain([0, tuning.keyCount + 1]);
+        xOv.domain([0, tuning.keyCount]);
         // Set y scale domain
         const maxTime = +max(notes, d => d.end);
         yOv.domain([0, maxTime]);
@@ -75,7 +86,7 @@ export default class KalimbaRoll extends View {
         const ctx = this.canvas.getContext('2d');
         ctx.clearRect(0, 0, viewWidth, viewHeight);
         // Draw piano keys in background
-        this.drawPianoKeys(ctx, low, high);
+        this.drawKeys(ctx, tuning);
         // Draw overview notes
         this.drawNotes(ctx, notes, xOv, yOv);
 
@@ -110,21 +121,25 @@ export default class KalimbaRoll extends View {
      * Draws horizontal bands with alternating color to better distinguish rows.
      * @param {CanvasRenderingContext2D} ctx canvas rendering context
      */
-    drawPianoKeys = (ctx, low, high,) => {
-        const { height, margin, x } = this.state;
+    drawKeys = (ctx, tuning) => {
+        const { height, margin, x, pitchPositionMap } = this.state;
+        const pitches = tuning.getNotesInInstrumentOrder();
+        const keyLengthScale = scaleLinear()
+            .domain(extent(tuning.pitches))
+            .range([height, height / 4]);
         const w = x(1) - x(0) - 4;
         const yPos = margin.top;
         ctx.font = '16px sans-serif';
         ctx.textAlign = 'center';
-        for (let pitch = low - 1; pitch <= high + 1; pitch++) {
-            // Only draw for sharps
-            const xPos = x(pitch);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.fillRect(xPos + 2, yPos, w, height);
+        for (const pitch of pitches) {
+            const xPos = x(pitchPositionMap.get(pitch));
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            const keyHeight = keyLengthScale(pitch);
+            ctx.fillRect(xPos + 2, yPos, w, keyHeight);
             const note = Midi.getMidiNoteByNr(pitch);
-            ctx.fillStyle = 'steelblue';
+            ctx.fillStyle = 'black';
             const label = pitch % 12 === 0 ? note.label : note.name;
-            ctx.fillText(label, xPos + w / 2, yPos + height + 15);
+            ctx.fillText(label, xPos + w / 2 + 2, yPos + keyHeight - 10);
         }
     }
 
@@ -137,7 +152,7 @@ export default class KalimbaRoll extends View {
      * @param {Function} y D3 linearScale y scale
      */
     drawNotes = (ctx, data, x, y) => {
-        const { height, margin } = this.state;
+        const { height, margin, pitchPositionMap } = this.state;
         const w = x(1) - x(0);
         const w2 = w / 2;
         // Colorize by channel
@@ -152,7 +167,7 @@ export default class KalimbaRoll extends View {
             ctx.fillStyle = startPos <= height ? cols[note.channel % cols.length] : 'gray';
             const yPos = margin.top + endPos;
             const h = Math.max(startPos - endPos, 1);
-            const xPos = x(note.pitch);
+            const xPos = x(pitchPositionMap.get(note.pitch));
             Canvas.drawNoteTrapezoidUpwards(ctx, xPos, yPos, w, h, w2);
         }
     }
@@ -195,13 +210,6 @@ export default class KalimbaRoll extends View {
                     width={viewWidth}
                     height={viewHeight}
                 >
-                    <text
-                        className='heading'
-                        x={viewWidth / 2}
-                        y={20}
-                    >
-                        Kalimba Roll
-                    </text>
                     <g
                         ref={n => this.svg = n}
                         transform={`translate(${margin.left}, ${margin.top})`}
