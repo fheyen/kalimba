@@ -1,7 +1,7 @@
 import React from 'react';
 import { schemeCategory10, select, scaleLinear, extent, max } from 'd3';
 import View from '../lib/ui/View';
-import { Utils, Midi, Canvas } from 'musicvis-lib';
+import { Utils, Midi, Canvas, Lamellophone } from 'musicvis-lib';
 
 
 export default class KalimbaRoll extends View {
@@ -14,7 +14,6 @@ export default class KalimbaRoll extends View {
             overviewWidth: 80,
             // For checking if there are new notes
             lastData: [],
-            lastTrack: 'all',
             notes: []
         };
     }
@@ -28,24 +27,13 @@ export default class KalimbaRoll extends View {
     componentDidUpdate() {
         this.resizeComponent();
         const { data, selectedTrack } = this.props;
-        if (data !== this.state.lastData
-            || selectedTrack !== this.state.lastTrack) {
-            let notes = [];
-            if (data && data.length > 0) {
-                if (selectedTrack === 'all') {
-                    // Show all tracks
-                    notes = Utils.flattenArray(data);
-                } else {
-                    // Show selected track
-                    notes = data[selectedTrack];
-                }
-            }
+        if (data !== this.state.lastData) {
             // Update state, cache notes
             this.setState(
                 {
                     lastData: data,
                     lastTrack: selectedTrack,
-                    notes: notes
+                    notes: data
                 },
                 this.updateBackground
             );
@@ -131,17 +119,12 @@ export default class KalimbaRoll extends View {
         for (let pitch = low - 1; pitch <= high + 1; pitch++) {
             // Only draw for sharps
             const xPos = x(pitch);
-            if (Midi.isSharp(pitch)) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                ctx.fillRect(xPos + 2, yPos, w, height);
-            } else {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.fillRect(xPos + 2, yPos, w, height);
-                const note = Midi.getMidiNoteByNr(pitch);
-                ctx.fillStyle = 'steelblue';
-                const label = pitch % 12 === 0 ? note.label : note.name;
-                ctx.fillText(label, xPos + w / 2, yPos + height + 15);
-            }
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.fillRect(xPos + 2, yPos, w, height);
+            const note = Midi.getMidiNoteByNr(pitch);
+            ctx.fillStyle = 'steelblue';
+            const label = pitch % 12 === 0 ? note.label : note.name;
+            ctx.fillText(label, xPos + w / 2, yPos + height + 15);
         }
     }
 

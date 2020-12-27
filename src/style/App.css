@@ -4,23 +4,6 @@
 }
 
 /* Colors */
-.bright {
-    --accentColor: steelblue;
-    --bodyBgColor: #f0f0f0;
-    --textColor: #555;
-    --toolbarBorderColor:  #dadada;
-    --viewBgColor: #fff;
-    --viewBorderColor:  #e8e8e8;
-    --axisColor: #aaa;
-    --svgTextColor: #555;
-    --btnColor: #555;
-    --btnBgColor: #eee;
-    --btnBorderColor: #ddd;
-    --scrollBarTrackBg: rgba(128, 128, 128, 0.25);
-    --scrollBarThumbBg: #999;
-    --scrollBarThumbBgHover: #bbb;
-}
-
 .dark {
     --accentColor: steelblue;
     --bodyBgColor: #222;
@@ -48,6 +31,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #222;
 }
 
 .App {
@@ -56,58 +40,14 @@ body {
     right: 0;
     bottom: 0;
     left: 0;
-    background: var(--bodyBgColor);
     color: var(--textColor);
     padding: 10px;
-}
-
-/* List of views on the left */
-.ViewList {
-    width: 180px;
-    padding-left: 15px;
-    user-select: none;
-}
-
-.ViewList h2 {
-    margin-top: 15px;
-    font-weight: normal;
-}
-
-.ViewList button.ViewBtn {
-    display: block;
-    width: 150px;
-    margin: 10px 5px;
-    background: none;
-    border: none;
-    border-left: 3px solid transparent;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.25);
-    border-radius: 0;
-    text-align: left;
-}
-
-.ViewList button.ViewBtn.active {
-    border-left: 3px solid var(--accentColor);
-}
-
-/* Views Grid */
-.ViewsGrid {
-    position: absolute;
-    top: 50px;
-    left: 180px;
-    right: 0;
-    bottom: 0;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    display: grid;
-    grid-auto-rows: min-content;
-    gap: 8px;
 }
 
 /* Views */
 .View {
     background: var(--viewBgColor);
     position: relative;
-    border: 1px solid var(--viewBorderColor);
     border-radius: 5px;
     padding-bottom: 5px;
 }
@@ -126,32 +66,6 @@ body {
     pointer-events: none;
 }
 
-.View .viewControls {
-    text-align: center;
-}
-
-.View .viewControls > div {
-    display: inline-block;
-    margin: 0 6px;
-}
-
-
-.View .sizeControl {
-    position: absolute;
-    top: 0;
-    right: 0;
-    opacity: 0.5;
-}
-
-.View .sizeControl:hover {
-    opacity: 1;
-}
-
-.View .sizeControl button {
-    margin: 0;
-    border: none;
-    background: none;
-}
 
 .ViewsGrid button,
 .ViewsGrid input {
@@ -323,11 +237,4 @@ select:disabled:hover {
 .githubLink a {
     text-decoration: none;
     color: #aaa;
-}
-
-
-/* File Input */
-.fileSelection {
-    margin: 10px;
-    text-align: center;
 }

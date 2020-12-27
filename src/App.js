@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import './style/App.css';
-import MidiParser from 'midi-parser-js';
 import KalimbaTab from './components/KalimbaTab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { preprocessMidiFileData } from 'musicvis-lib';
 
 
 export default class App extends Component {
@@ -25,21 +23,6 @@ export default class App extends Component {
     // Scale layout to current screen size
     window.addEventListener('resize', this.onResize, false);
     this.onResize();
-
-    // select the INPUT element that will handle
-    // the file selection.
-    let source = document.getElementById('filereader');
-    // provide the File source and a callback function
-    const _this = this;
-    MidiParser.parse(source, function (obj) {
-      try {
-        const parsed = preprocessMidiFileData(obj);
-        const parts = parsed.parts.map(d => d.noteObjs);
-        _this.setState({ midiFileData: parts });
-      } catch (e) {
-        alert('Invalid MIDI file or wrong format!');
-      }
-    });
   }
 
   /**
@@ -61,7 +44,6 @@ export default class App extends Component {
       <div className={`App dark`} >
         <KalimbaTab
           viewSize={s.viewSize}
-          midiFileData={s.midiFileData}
         />
         <div className='githubLink'>
           <a href='https://github.com/fheyen/midi-pianoroll'>
