@@ -93,9 +93,6 @@ body {
 }
 
 /* SVGs */
-svg {
-}
-
 svg text {
     font: 13px sans-serif;
     user-select: none;
@@ -231,7 +228,7 @@ select:disabled:hover {
 
 /* GitHub Link */
 .githubLink {
-    margin-top: 25px;
+    margin: 25px;
     text-align: center;
 }
 .githubLink a {

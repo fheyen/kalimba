@@ -1,7 +1,7 @@
 import React from 'react';
 import { schemeCategory10, select, scaleLinear, extent, max } from 'd3';
 import View from '../lib/ui/View';
-import { Utils, Midi, Canvas, Lamellophone } from 'musicvis-lib';
+import { Midi, Canvas } from 'musicvis-lib';
 
 
 export default class KalimbaRoll extends View {
@@ -59,7 +59,7 @@ export default class KalimbaRoll extends View {
         const overviewX1 = margin.left + width - overviewWidth;
         const x = scaleLinear().range([margin.left, overviewX1 - 20]);
         const xOv = scaleLinear().range([overviewX1, overviewX1 + overviewWidth]);
-        const y = scaleLinear().range([height, 0]);
+        const y = scaleLinear().range([height * 0.75, 0]);
         const yOv = scaleLinear().range([height, 0]);
         // Setup canvas rescaled to device pixel ratio
         Canvas.setupCanvas(this.canvas);
@@ -98,23 +98,25 @@ export default class KalimbaRoll extends View {
      * component
      */
     draw = () => {
-        const { viewWidth, viewHeight, rowSpan, margin, x, y, notes } = this.state;
-        const { currentPlayerTime } = this.props;
-        if (!notes || notes.length === 0) { return; }
+        window.requestAnimationFrame(() => {
+            const { viewWidth, viewHeight, rowSpan, margin, x, y, notes } = this.state;
+            const { currentPlayerTime } = this.props;
+            if (!notes || notes.length === 0) { return; }
 
-        // Update y scale for currentPlayerTime
-        const t = currentPlayerTime !== null ? currentPlayerTime : 0;
-        const limit = t + 2 * rowSpan;
-        y.domain([t, limit]);
+            // Update y scale for currentPlayerTime
+            const t = currentPlayerTime !== null ? currentPlayerTime : 0;
+            const limit = t + 2 * rowSpan;
+            y.domain([t, limit]);
 
-        // Draw foreground (changes all the time)
-        const ctx2 = this.highlightCanvas.getContext('2d');
-        ctx2.clearRect(0, 0, viewWidth, viewHeight);
-        // Draw notes onto canvas
-        this.drawNotes(ctx2, notes, x, y);
-        // Draw current player time
-        this.drawCurrentPlayerTime(ctx2, t, limit);
-        ctx2.clearRect(0, 0, viewWidth, margin.top);
+            // Draw foreground (changes all the time)
+            const ctx2 = this.highlightCanvas.getContext('2d');
+            ctx2.clearRect(0, 0, viewWidth, viewHeight);
+            // Draw notes onto canvas
+            this.drawNotes(ctx2, notes, x, y);
+            // Draw current player time
+            this.drawCurrentPlayerTime(ctx2, t, limit);
+            ctx2.clearRect(0, 0, viewWidth, margin.top);
+        });
     }
 
     /**
@@ -126,9 +128,9 @@ export default class KalimbaRoll extends View {
         const pitches = tuning.getNotesInInstrumentOrder();
         const keyLengthScale = scaleLinear()
             .domain(extent(tuning.pitches))
-            .range([height, height / 4]);
+            .range([height / 4, height / 8]);
         const w = x(1) - x(0) - 4;
-        const yPos = margin.top;
+        const yPos = margin.top + height * 0.75;
         ctx.font = '16px sans-serif';
         ctx.textAlign = 'center';
         for (const pitch of pitches) {
@@ -153,6 +155,7 @@ export default class KalimbaRoll extends View {
      */
     drawNotes = (ctx, data, x, y) => {
         const { height, margin, pitchPositionMap } = this.state;
+        const { currentPlayerTime } = this.props;
         const w = x(1) - x(0);
         const w2 = w / 2;
         // Colorize by channel
@@ -164,11 +167,12 @@ export default class KalimbaRoll extends View {
             if (startPos < 0 || endPos > height) {
                 continue;
             }
-            ctx.fillStyle = startPos <= height ? cols[note.channel % cols.length] : 'gray';
+            ctx.fillStyle = note.start >= currentPlayerTime ? cols[note.channel % cols.length] : 'gray';
             const yPos = margin.top + endPos;
             const h = Math.max(startPos - endPos, 1);
             const xPos = x(pitchPositionMap.get(note.pitch));
             Canvas.drawNoteTrapezoidUpwards(ctx, xPos, yPos, w, h, w2);
+            // Canvas.drawRoundedRect(ctx, xPos, yPos, w, h, radius);
         }
     }
 

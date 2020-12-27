@@ -4,7 +4,6 @@
   "homepage": "https://fheyen.github.io/kalimba/",
   "private": false,
   "dependencies": {
-    "-": "^0.0.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-brands-svg-icons": "^5.15.1",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
@@ -16,12 +15,11 @@
     "eslint": "^7.16.0",
     "eslint-config-react-app": "^6.0.0",
     "midi-parser-js": "^4.0.4",
-    "musicvis-lib": "^0.29.1",
+    "musicvis-lib": "^0.29.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-refresh": "^0.9.0",
     "react-scripts": "4.0.1",
-    "s": "^1.0.0",
     "soundfont-player": "^0.12.0"
   },
   "devDependencies": {

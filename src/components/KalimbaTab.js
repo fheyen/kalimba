@@ -7,8 +7,6 @@ import Player from '../lib/Player';
 import MidiParser from 'midi-parser-js';
 import { preprocessMidiFileData } from 'musicvis-lib';
 
-
-
 export default class KalimbaTab extends View {
 
     constructor(props) {
@@ -17,7 +15,7 @@ export default class KalimbaTab extends View {
         this.state = {
             ...this.state,
             input: {
-                midi: true,
+                midi: false,
                 track: 0,
                 transpose: 0,
                 midiFileData: [],
@@ -75,16 +73,9 @@ export default class KalimbaTab extends View {
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.input !== prevState.input) {
-            // console.log('input update');
-            // TODO: update notes
             const notes = this.getNotes();
             this.setState({ notes });
         }
-        // if (this.state.output !== prevState.output) {
-        //     console.log('output update');
-        //     // TODO: update output
-        //     this.updateTab();
-        // }
     }
 
 
@@ -177,7 +168,7 @@ export default class KalimbaTab extends View {
 
 
     render() {
-        const { viewWidth, viewHeight, input, output, notes } = this.state;
+        const { input, output, notes } = this.state;
         const { midi, midiFileData, transpose } = input;
         const { useHtml, letter } = output;
         if (this.mounted) {
@@ -189,10 +180,7 @@ export default class KalimbaTab extends View {
 
         // HTML
         return (
-            <div
-                className='View KalimbaTab'
-                style={{ gridArea: `span ${this.state.rowSpan} / span ${this.state.columnSpan}` }}
-            >
+            <div className='View KalimbaTab'>
                 <div className='control'>
                     <div>
                         <label>
@@ -201,55 +189,51 @@ export default class KalimbaTab extends View {
                                 {midi ? 'MIDI' : 'Text'}
                             </button>
                         </label>
-                        {midi &&
-                            <div>
-                                <label>
-                                    Open a MIDI file
+                        <div
+                            style={{ display: midi ? 'block' : 'none' }}
+                        >
+                            <label>
+                                Open a MIDI file
                                     <input
-                                        className='fileInput'
-                                        type='file'
-                                        id='filereader'
-                                        accept='.midi,.mid'
-                                        style={{ display: midi ? 'inline-block' : 'none' }}
-                                    />
-                                </label>
-                                <label>
-                                    Track:
+                                    className='fileInput'
+                                    type='file'
+                                    id='filereader'
+                                    accept='.midi,.mid'
+                                    style={{ display: midi ? 'inline-block' : 'none' }}
+                                />
+                            </label>
+                            <label>
+                                Track:
                                     <select
-                                        onChange={e => this.setState({ input: { ...input, track: +e.target.value } })}
-                                        disabled={midiFileData.length === 0}
-                                    >
-                                        {midiFileData.map((d, i) => (
-                                            <option
-                                                key={i}
-                                                value={i}
-                                            >
-                                                Track {i} ({d.length} notes)
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-                                <label>
-                                    Transpose:
+                                    onChange={e => this.setState({ input: { ...input, track: +e.target.value } })}
+                                    disabled={midiFileData.length === 0}
+                                >
+                                    {midiFileData.map((d, i) => (
+                                        <option
+                                            key={i}
+                                            value={i}
+                                        >
+                                            Track {i} ({d.length} notes)
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label>
+                                Transpose:
                                     <input
-                                        type='number'
-                                        defaultValue={transpose}
-                                        min='-4'
-                                        max='4'
-                                        step='1'
-                                        onChange={e => this.setState({ input: { ...input, transpose: +e.target.value } })}
-                                        disabled={midiFileData.length === 0}
-                                    />
-                                </label>
-                            </div>
-                        }
+                                    type='number'
+                                    defaultValue={transpose}
+                                    min='-127'
+                                    max='127'
+                                    step='1'
+                                    onChange={e => this.setState({ input: { ...input, transpose: +e.target.value } })}
+                                    disabled={midiFileData.length === 0}
+                                />
+                            </label>
+                        </div>
                         <textarea
                             ref={n => this.textArea = n}
-                            style={{
-                                width: viewWidth - 60,
-                                height: viewHeight / 6,
-                                display: midi ? 'none' : 'block'
-                            }}
+                            style={{ display: midi ? 'none' : 'block' }}
                             placeholder='Write or paste a kalimba tab in letter or number notation here'
                             onChange={e => this.setState({ input: { ...input, textInput: e.target.value } })}
                         />
@@ -291,16 +275,12 @@ export default class KalimbaTab extends View {
                 <div
                     className='tab'
                     ref={n => this.tab = n}
-                    style={{
-                        width: '100%',
-                        height: viewHeight / 3,
-                    }}
                 />
                 <KalimbaRoll
                     name='Kalimba Roll'
                     viewSize={{
                         outerWidth: this.props.viewSize.outerWidth - 60,
-                        outerHeight: viewHeight / 2
+                        outerHeight: 800
                     }}
                     tuning={this.tuning}
                     data={notes}
