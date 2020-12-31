@@ -44,6 +44,15 @@ export default class KalimbaTab extends View {
         this.player = new Player()
             .onTimeChange(time => this.setState({ currentPlayerTime: time }))
             .setVolume(3);
+        this.example = `A B C a b c abc
+
+1 2 3
+
+C° C' C*
+
+(C E G)
+
+(C° E G)`;
     }
 
     componentDidMount() {
@@ -53,18 +62,17 @@ export default class KalimbaTab extends View {
             console.log(sharedNotes);
             this.setState({ notes: sharedNotes })
         }
-
-        let source = document.getElementById('filereader');
-        console.log(source);
-
-        const _this = this;
-        MidiParser.parse(source, function (obj) {
+        const source = document.getElementById('filereader');
+        MidiParser.parse(source, (obj) => {
             try {
                 const parsed = preprocessMidiFileData(obj);
                 const parts = parsed.parts.map(d => d.noteObjs);
-                console.log(parts);
-
-                _this.setState({ input: { ..._this.state.input, midiFileData: parts } });
+                this.setState({
+                    input: {
+                        ...this.state.input,
+                        midiFileData: parts
+                    }
+                });
             } catch (e) {
                 alert('Invalid MIDI file or wrong format!');
             }
@@ -76,6 +84,16 @@ export default class KalimbaTab extends View {
             const notes = this.getNotes();
             this.setState({ notes });
         }
+    }
+
+    showExample = () => {
+        this.textArea.value = this.example;
+        this.setState({
+            input: {
+                ...this.state.input,
+                textInput: this.example
+            }
+        });
     }
 
 
@@ -119,24 +137,24 @@ export default class KalimbaTab extends View {
         }
     }
 
+    /**
+     * @todo broken for some cases
+     */
     parseShareUrl = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const param = urlParams.get('notes');
         if (!param) {
             return [];
         }
-        const uri = param.split('=');
-        if (uri.length < 2) {
-            return [];
-        }
         let parsed;
         try {
-            parsed = JSON.parse(uri[1]);
+            parsed = JSON.parse(param);
             if (!parsed) {
                 return [];
             }
         } catch (e) {
-            console.log(e);
+            console.warn(e);
+            console.log(param);
             return [];
         }
         return new NoteArray(parsed).getNotes();
@@ -145,7 +163,8 @@ export default class KalimbaTab extends View {
     copyShareUrl = () => {
         const { notes } = this.state;
         const uri = encodeURI(JSON.stringify(notes));
-        const url = `${window.location.href}?notes=${uri}`;
+        const location = window.location.href.split('?')[0];
+        const url = `${location}?notes=${uri}`;
         navigator.clipboard.writeText(url)
             .then(() => {
                 alert('Text copied to clipboard');
@@ -176,7 +195,6 @@ export default class KalimbaTab extends View {
         } else {
             this.mounted = true;
         }
-        // console.log(this.state);
 
         // HTML
         return (
@@ -189,6 +207,13 @@ export default class KalimbaTab extends View {
                                 {midi ? 'MIDI' : 'Text'}
                             </button>
                         </label>
+                        {!midi &&
+                            <label>
+                                <button onClick={this.showExample}>
+                                    Show example
+                                </button>
+                            </label>
+                        }
                         <div
                             style={{ display: midi ? 'block' : 'none' }}
                         >
@@ -205,7 +230,9 @@ export default class KalimbaTab extends View {
                             <label>
                                 Track:
                                     <select
-                                    onChange={e => this.setState({ input: { ...input, track: +e.target.value } })}
+                                    onChange={e => this.setState({
+                                        input: { ...input, track: +e.target.value }
+                                    })}
                                     disabled={midiFileData.length === 0}
                                 >
                                     {midiFileData.map((d, i) => (
@@ -226,7 +253,9 @@ export default class KalimbaTab extends View {
                                     min='-127'
                                     max='127'
                                     step='1'
-                                    onChange={e => this.setState({ input: { ...input, transpose: +e.target.value } })}
+                                    onChange={e => this.setState({
+                                        input: { ...input, transpose: +e.target.value }
+                                    })}
                                     disabled={midiFileData.length === 0}
                                 />
                             </label>
@@ -235,19 +264,25 @@ export default class KalimbaTab extends View {
                             ref={n => this.textArea = n}
                             style={{ display: midi ? 'none' : 'block' }}
                             placeholder='Write or paste a kalimba tab in letter or number notation here'
-                            onChange={e => this.setState({ input: { ...input, textInput: e.target.value } })}
+                            onChange={e => this.setState({
+                                input: { ...input, textInput: e.target.value }
+                            })}
                         />
                     </div>
                     <div>
                         <label>
                             Output:
-                            <button onClick={() => this.setState({ output: { ...output, useHtml: !useHtml } })}>
-                                {useHtml ? 'HTML' : 'Text'}
+                            <button onClick={() => this.setState({
+                            output: { ...output, useHtml: !useHtml }
+                        })}>
+                                {useHtml ? 'Fancy' : 'Text'}
                             </button>
                         </label>
                         <label>
                             Note symbols:
-                            <button onClick={() => this.setState({ output: { ...output, letter: !letter } })}>
+                            <button onClick={() => this.setState({
+                            output: { ...output, letter: !letter }
+                        })}>
                                 {letter ? 'Letter' : 'Number'}
                             </button>
                         </label>

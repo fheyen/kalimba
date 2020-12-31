@@ -8,14 +8,14 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.1",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.14",
-    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.6.0",
     "d3": "^6.3.1",
     "eslint": "^7.16.0",
     "eslint-config-react-app": "^6.0.0",
     "midi-parser-js": "^4.0.4",
-    "musicvis-lib": "^0.29.2",
+    "musicvis-lib": "^0.33.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-refresh": "^0.9.0",
@@ -37,7 +37,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "checkupdates": "npm-check-updates -u"
+    "upd": "npm-check-updates -u"
   },
   "eslintConfig": {
     "extends": [
