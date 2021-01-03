@@ -44,15 +44,7 @@ export default class KalimbaTab extends View {
         this.player = new Player()
             .onTimeChange(time => this.setState({ currentPlayerTime: time }))
             .setVolume(3);
-        this.example = `A B C a b c abc
-
-1 2 3
-
-C° C' C*
-
-(C E G)
-
-(C° E G)`;
+        this.example = `A B C a b c abc \n1 2 3 \nC° C' C* \n(C E G) \n(C° E G)`;
     }
 
     componentDidMount() {
@@ -167,7 +159,7 @@ C° C' C*
         const url = `${location}?notes=${uri}`;
         navigator.clipboard.writeText(url)
             .then(() => {
-                alert('Text copied to clipboard');
+                alert('Share URL copied to clipboard!');
             })
             .catch(err => {
                 alert('Error in copying text: ', err);
@@ -302,8 +294,11 @@ C° C' C*
                         />
                     </div>
                     <div>
-                        <button onClick={this.copyShareUrl}>
-                            Copy share URL
+                        <button
+                            title='Copies the share URL to your clipboard'
+                            onClick={this.copyShareUrl}
+                        >
+                            Share
                         </button>
                     </div>
                 </div>
