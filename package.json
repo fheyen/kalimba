@@ -4,11 +4,11 @@
   "homepage": "https://fheyen.github.io/kalimba/",
   "private": false,
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-brands-svg-icons": "^5.15.1",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.14",
-    "@testing-library/jest-dom": "^5.11.8",
+    "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.8.0",
     "d3": "^6.3.1",
